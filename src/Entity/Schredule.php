@@ -26,6 +26,19 @@ class Schredule
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column(length: 100)]
+    private ?string $category = null;
+
+    public function hydrateDTO(array $tag)
+    {
+        foreach($tag as $key => $value) {
+            if ($key != 'id') {
+                $attribute ='set'. ucfirst($key);
+                $this->$attribute($value);
+            }
+        }
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -75,6 +88,18 @@ class Schredule
     public function setDate(\DateTimeInterface $date): static
     {
         $this->date = $date;
+
+        return $this;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    public function setCategory(string $category): static
+    {
+        $this->category = $category;
 
         return $this;
     }
