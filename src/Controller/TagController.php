@@ -39,7 +39,8 @@ class TagController  extends AbstractController
     public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
         $page = $request->get('page') ? $request->get('page') : 1;
-        $numberItemReturned = 20;
+        $numberItemReturned = $request->get('numberItem') ? $request->get('numberItem') : null;
+
         $offset = ($page - 1) * $numberItemReturned;
 
         $tagRepository  = $entityManager->getRepository(Tag::class);

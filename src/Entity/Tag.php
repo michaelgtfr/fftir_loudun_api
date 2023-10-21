@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\TagRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use PhpParser\Node\Expr\Cast\Object_;
@@ -32,6 +34,14 @@ class Tag
     #[Assert\NotBlank (message: 'la valeur "style" ne peux pas être vide')]
     #[Assert\Type('array')]
     private array $style = [];
+
+    #[ORM\ManyToMany(targetEntity: BlogPost::class, mappedBy: 'relation')]
+    private Collection $blogPosts;
+
+    public function __construct()
+    {
+        $this->blogPosts = new ArrayCollection();
+    }
 
 
     public function hydrateDTO(array $tag)
@@ -81,6 +91,33 @@ class Tag
     public function setStyle(array $style): static
     {
         $this->style = $style;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BlogPost>
+     */
+    public function getBlogPosts(): Collection
+    {
+        return $this->blogPosts;
+    }
+
+    public function addBlogPost(BlogPost $blogPost): static
+    {
+        if (!$this->blogPosts->contains($blogPost)) {
+            $this->blogPosts->add($blogPost);
+            $blogPost->addRelation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBlogPost(BlogPost $blogPost): static
+    {
+        if ($this->blogPosts->removeElement($blogPost)) {
+            $blogPost->removeRelation($this);
+        }
 
         return $this;
     }
